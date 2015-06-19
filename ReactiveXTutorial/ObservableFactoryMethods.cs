@@ -3,6 +3,9 @@ using System.Reactive.Linq;
 
 namespace ReactiveXTutorial
 {
+    /// <summary>
+    /// Working through the 'Curing the asynchronous blues with the Reactive Extensions for .NET' tutorial (C:\Users\csudbery\Dropbox\IT Training\CSharp Stuff\ReactiveX\ReactiveX Tutorial.pdf)
+    /// </summary>
     public static class ObservableFactoryMethods
     {
         /// <summary>
@@ -104,17 +107,58 @@ namespace ReactiveXTutorial
         /// </summary>
         public static void Generate()
         {
-            // This is a bit like a for loop
+            // This is basically a for loop
             IObservable<int> source = Observable.Generate
+            (
+                // Starting value is 0 (first part of the for statement)
+                0,
+                // Keep going as long as i < 5 (second part of the for statement)
+                i => i < 5,
+                // How to get to the next iterator (third part of the for statement)
+                i => i + 1,
+                // On each iteration, execute the following statement (body of the for statement)
+                i => i * i
+            ); 
+
+            IDisposable subscription = source.Subscribe
                 (
-                    // Starting value is 0
-                    0, 
-                    // Keep going as long as i < 5
-                    i => i < 5, 
-                    // On each iteration, execute BOTH of the following statements: First add 1, then multiply by itself
-                    i => i + 1, 
-                    i => i * i
-                ); 
+                    (int x) => Console.WriteLine("OnNext:  {0}", x),
+                    (Exception ex) => Console.WriteLine("OnError: {0}", ex.Message),
+                    () => Console.WriteLine("OnCompleted")
+                );
+
+            Console.WriteLine("Press ENTER to unsubscribe...");
+            Console.ReadLine();
+
+            subscription.Dispose();
+        }
+
+        /// <summary>
+        /// Same as Generate (see above) (in fact uses an overload of Generate), but specifying time between iterations
+        /// The output looks like this:
+        ///   OnNext: 0     
+        ///   OnNext: 1     
+        ///   OnNext: 4     
+        ///   OnNext: 9     
+        ///   OnNext: 16     
+        ///   OnCompleted 
+        /// </summary>
+        public static void Generate_WithTime()
+        {
+            // This is basically a for loop with an added time element
+            IObservable<int> source = Observable.Generate
+            (
+                // Starting value is 0 (first part of the for statement)
+                0,
+                // Keep going as long as i < 5 (second part of the for statement)
+                i => i < 5,
+                // How to get to the next iterator (third part of the for statement)
+                i => i + 1,
+                // On each iteration, execute the following statement (body of the for statement)
+                i => i * i,
+                // Specify the iteration time between each result
+                i => TimeSpan.FromSeconds(i)
+            );
 
             IDisposable subscription = source.Subscribe
                 (

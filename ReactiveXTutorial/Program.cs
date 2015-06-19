@@ -15,7 +15,7 @@ namespace ReactiveXTutorial
     {
         static void Main(string[] args)
         {
-            //ReactiveXExamples.Example05_Return_ObservableFactoryMethod();
+            OtherMethodsOnObservable.UseExtensionMethodForTimestampedLogging();
         }
     }
 }
